@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="utf-8"?>
+<addon addon_id="ProfileUserTracker" title="User Actions Tracker by kiror" version_string="0.0" version_id="0" url="https://github.com/adlerosn/" install_callback_class="ProfileUserTracker_setup" install_callback_method="install" uninstall_callback_class="ProfileUserTracker_setup" uninstall_callback_method="uninstall">
+  <admin_navigation>
+    <navigation navigation_id="usttrkhm" parent_navigation_id="setup" display_order="16" link="" admin_permission_id="" debug_only="0" hide_no_children="0"/>
+    <navigation navigation_id="usttrkhm2" parent_navigation_id="usttrkhm" display_order="1" link="usertracking" admin_permission_id="" debug_only="0" hide_no_children="0"/>
+    <navigation navigation_id="usttrkhusr" parent_navigation_id="usersSection" display_order="200" link="usertracking" admin_permission_id="" debug_only="0" hide_no_children="0"/>
+  </admin_navigation>
+  <admin_permissions/>
+  <admin_style_properties/>
+  <admin_templates>
+    <template title="kiror_user_tracking_page"><![CDATA[<xen:title>User tracking</xen:title>
+
+<script>
+function senduid(){
+u=document.getElementById('bid').value;
+base="{xen:adminlink 'usertracking/'}";
+window.location.href = base+'id/'+u+'/';
+}
+</script>
+
+<script>
+function sendunm(){
+u=document.getElementById('bnm').value;
+base="{xen:adminlink 'usertracking/'}";
+window.location.href = base+'nm/'+u+'/';
+}
+</script>
+
+<script>
+function sendreset(){
+base="{xen:adminlink 'usertracking/'}";
+window.location.href = base;
+}
+</script>
+
+<script>
+function pgnxt(){
+base="{xen:adminlink 'usertracking/'}";
+window.location.href = base+'{xen:raw $prevnxt}'+({xen:raw $page}+1)+'/';
+}
+</script>
+
+<script>
+function pgprv(){
+base="{xen:adminlink 'usertracking/'}";
+window.location.href = base+'{xen:raw $prevnxt}'+({xen:raw $page}-1)+'/';
+}
+</script>
+
+<script>
+function pgrfs(){
+base="{xen:adminlink 'usertracking/'}";
+window.location.href = base+'{xen:raw $prevnxt}'+{xen:raw $page}+'/';
+}
+</script>
+
+<div class="section"><h2 class="subHeading">Filtering:</h2>
+<dt><dd><ul><li>
+<input type="number" name="uid" placeholder="User ID"  id="bid" />
+<input onclick="senduid()" type="submit" value="{xen:phrase filter}" class="button primary submitUnit" />
+</li></ul></dd></dt>
+<dt><dd><ul><li>
+<input type="text" name="unm" placeholder="Username" id="bnm" />
+<input onclick="sendunm()" type="submit" value="{xen:phrase filter}" class="button primary submitUnit" />
+</li></ul></dd></dt>
+<input onclick="sendreset()" type="submit" value="Reset filters" class="button primary submitUnit" />
+</div>
+<br />
+{xen:raw $prevnxtjs}
+Page: 
+<input onclick="pgprv()" type="submit" value="-" class="button submitUnit" />
+<input onclick="pgrfs()" type="submit" value="{xen:raw $page}" class="button submitUnit" />
+<input onclick="pgnxt()" type="submit" value="+" class="button submitUnit" />
+<div class="section"><h2 class="subHeading">Navigation history:</h2>
+{xen:raw $htmlpage}
+</div>
+Page: 
+<input onclick="pgprv()" type="submit" value="-" class="button submitUnit" />
+<input onclick="pgrfs()" type="submit" value="{xen:raw $page}" class="button submitUnit" />
+<input onclick="pgnxt()" type="submit" value="+" class="button submitUnit" />]]></template>
+  </admin_templates>
+  <admin_template_modifications>
+    <modification template="home" modification_key="addlinkathome" description="Create a button at home." execution_order="10" enabled="1" action="str_replace">
+      <find><![CDATA[<!-- slot: pre_nodes -->
+			
+		<xen:if is="{$canManageNodes}">
+			<li><a href="{xen:adminlink 'nodes'}" class="nodes">
+				<span class="icon"><span></span></span>
+				<span class="linkText">{xen:phrase display_node_tree}</span>
+				</a></li>
+		</xen:if>
+		
+		</xen:hook>]]></find>
+      <replace><![CDATA[<!-- slot: pre_nodes -->
+			
+		<xen:if is="{$canManageNodes}">
+			<li><a href="{xen:adminlink 'nodes'}" class="nodes">
+				<span class="icon"><span></span></span>
+				<span class="linkText">{xen:phrase display_node_tree}</span>
+				</a></li>
+		</xen:if>
+		
+		</xen:hook>
+
+		<!-- slot: user_browsing --><li>
+		<a href="{xen:adminlink 'usertracking'}" class="admin_navigation">
+			<span class="icon"><span></span></span>
+			<span class="linkText">User browsing</span>
+			</a></li>]]></replace>
+    </modification>
+  </admin_template_modifications>
+  <code_events/>
+  <code_event_listeners>
+    <listener event_id="load_class_view" execute_order="10" callback_class="ProfileUserTracker_callback" callback_method="load_class" active="1" hint="" description="Overrides FrontController class, run some routines, then run overrided code."/>
+  </code_event_listeners>
+  <cron>
+    <entry entry_id="cronuseracttrackeroldage" cron_class="ProfileUserTracker_sharedstatic" cron_method="pruneOlders" active="1"><![CDATA[{"day_type":"dom","dom":["-1"],"hours":["-1"],"minutes":["37"]}]]></entry>
+  </cron>
+  <email_templates/>
+  <email_template_modifications/>
+  <optiongroups>
+    <group group_id="useracttracker" display_order="1" debug_only="0"/>
+    <option option_id="useracttrackeroldage" edit_format="spinbox" data_type="positive_integer" can_backup="1">
+      <default_value>3</default_value>
+      <edit_format_params></edit_format_params>
+      <sub_options></sub_options>
+      <relation group_id="useracttracker" display_order="1"/>
+    </option>
+  </optiongroups>
+  <permissions>
+    <permission_groups/>
+    <permissions/>
+    <interface_groups/>
+  </permissions>
+  <phrases>
+    <phrase title="admin_navigation_usttrkhm" version_id="0" version_string="0.0"><![CDATA[Users' browsing]]></phrase>
+    <phrase title="admin_navigation_usttrkhm2" version_id="0" version_string="0.0"><![CDATA[Track users' activity]]></phrase>
+    <phrase title="admin_navigation_usttrkhusr" version_id="0" version_string="0.0"><![CDATA[Track users' activity]]></phrase>
+    <phrase title="cron_entry_cronuseracttrackeroldage" version_id="0" version_string="0.0"><![CDATA[User Tracker Oldage callback caller]]></phrase>
+    <phrase title="option_group_useracttracker" version_id="0" version_string="0.0"><![CDATA[User Actions Tracker options]]></phrase>
+    <phrase title="option_group_useracttracker_description" version_id="0" version_string="0.0"><![CDATA[Options for "User Actions Tracker"]]></phrase>
+    <phrase title="option_useracttrackeroldage" version_id="0" version_string="0.0"><![CDATA[Oldage]]></phrase>
+    <phrase title="option_useracttrackeroldage_explain" version_id="0" version_string="0.0"><![CDATA[After this amount of days, the database will forget user's navigation inside the forum.]]></phrase>
+  </phrases>
+  <route_prefixes>
+    <route_type type="admin">
+      <prefix original_prefix="usertracking" class="ProfileUserTracker_router" build_link="all"/>
+    </route_type>
+  </route_prefixes>
+  <style_properties/>
+  <templates/>
+  <public_template_modifications/>
+  <bb_code_media_sites/>
+  <bb_codes/>
+</addon>
