@@ -48,14 +48,56 @@ class ProfileUserTracker_sharedstatic
 		$dbc->query($q);
 	}
 	
-	public static function getFromDB($uid,$page,$resPerPage){
+	public static function getFromDB($uid,$page,$filter,$resPerPage){
+		$uid = intval($uid);
+		$page = intval($page);
+		$filter = self::mysql_escape_mimic_fromPhpDoc($filter);
+		$resPerPage = intval($resPerPage);
 		$q='SELECT seq,uid,uts,href,flag FROM `kiror_user_browsing`';
 		if($uid==0){
-			$q.=' ';
+			$q.=' WHERE href LIKE \'%'.$filter.'%\'';
 		}else{
-			$q.=' WHERE uid='.$uid.' ';
+			$q.=' WHERE uid='.$uid.' AND href LIKE \'%'.$filter.'%\'';
 		}
-		$q.='ORDER BY uts desc LIMIT '.$page*$resPerPage.' , '.$resPerPage;' ;';
+		$q.=' ORDER BY uts desc LIMIT '.$page*$resPerPage.' , '.$resPerPage;' ;';
+		//die($q);
+		$dbc=XenForo_Application::get('db');
+		$r=$dbc->fetchAll($q);
+		unset($dbc);
+		foreach($r as $k=>$v){
+			$r[$k]['flag']=unserialize($r[$k]['flag']);
+		}
+		//die(print_r($r,true));
+		return $r;
+	}
+	
+	public static function getFromDBLimitless($uid,$page,$filter){
+		$uid = intval($uid);
+		$page = intval($page);
+		$filter = self::mysql_escape_mimic_fromPhpDoc($filter);
+		$q='SELECT COUNT(seq) AS res FROM `kiror_user_browsing`';
+		if($uid==0){
+			$q.=' WHERE href LIKE \'%'.$filter.'%\'';
+		}else{
+			$q.=' WHERE uid='.$uid.' AND href LIKE \'%'.$filter.'%\'';
+		}
+		//die($q);
+		$dbc=XenForo_Application::get('db');
+		$r=$dbc->fetchRow($q)['res'];
+		unset($dbc);
+		return $r;
+	}
+	
+	public static function getAllFromDB($uid,$filter){
+		$uid = intval($uid);
+		$filter = self::mysql_escape_mimic_fromPhpDoc($filter);
+		$q='SELECT seq,uid,uts,href,flag FROM `kiror_user_browsing`';
+		if($uid==0){
+			$q.=' WHERE href LIKE \'%'.$filter.'%\'';
+		}else{
+			$q.=' WHERE uid='.$uid.' AND href LIKE \'%'.$filter.'%\'';
+		}
+		$q.=' ORDER BY uts ASC;';
 		//die($q);
 		$dbc=XenForo_Application::get('db');
 		$r=$dbc->fetchAll($q);

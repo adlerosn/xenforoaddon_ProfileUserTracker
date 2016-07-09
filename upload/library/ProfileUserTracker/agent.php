@@ -43,12 +43,13 @@ class ProfileUserTracker_agent extends XFCP_ProfileUserTracker_agent
 			//die(print_r(array($rq),true));
 			//**/
 			
-			
+			//hiding "_xfToken"
+			$urlprot = preg_replace('/((_xfToken=).+&|(_xfToken=).+$)/','_xfToken=<b><i>censored</i></b>&',$url);
 			
 			///Throwing everything in DB!
 			
 			if(strpos($url,'/admin.php') == false && strpos($url,'?chat/refresh') == false){
-				ProfileUserTracker_sharedstatic::putInDB($uid,$url,$now,$flags);
+				ProfileUserTracker_sharedstatic::putInDB($uid,$urlprot,$now,$flags);
 			}
 		}
 	}
