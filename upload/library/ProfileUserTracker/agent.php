@@ -1,11 +1,12 @@
 <?php
 
 class ProfileUserTracker_agent extends XFCP_ProfileUserTracker_agent
-{	
-	public function prepareParams()
+{
+	public function prepareParams() //load_class_view
 	{
-		parent::prepareParams();
-		if(XenForo_Visitor::getInstance()['user_id']){
+		$resp = parent::prepareParams();
+		$vis = XenForo_Visitor::getInstance();
+		if($vis['user_id']){
 			$rq=$this->_renderer->getRequest();
 			$dh=$this->_renderer->getDependencyHandler();
 			
@@ -16,8 +17,35 @@ class ProfileUserTracker_agent extends XFCP_ProfileUserTracker_agent
 			unset($prp);unset($rfl);
 			$defaultTemplateParams = $out; unset($out);
 			
-			$uid      =$defaultTemplateParams['visitor']['user_id'];
-			$url      =$defaultTemplateParams['requestPaths']['fullUri'];
+			
+			$uid      =$vis['user_id'];
+			$url      ='data:text/html;base64,';
+			if(!is_null($defaultTemplateParams) &&
+			   is_array($defaultTemplateParams) &&
+				array_key_exists('requestPaths',$defaultTemplateParams) &&
+			   is_array($defaultTemplateParams['requestPaths']) &&
+				array_key_exists('fullUri',$defaultTemplateParams['requestPaths'])){
+				$url=$defaultTemplateParams['requestPaths']['fullUri'];
+			}
+			else{
+				try{
+					$url=$rq->getRequestUri();
+				}
+				catch(Exception $e){
+					$url.=base64_encode('<!DOCTYPE html>
+<html>
+	<head>
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<title>Error: URL parsing</title>
+	</head>
+	<body>
+		<h1>Error</h1>
+		<p>An unexpected error happened while trying to get the URL from the page.</p>
+		<p>This message was stored as the URL instead.</p>
+	</body>
+</html>');
+				}
+			}
 			$now      =time();
 			$flags    =array();
 			if($rq->isPost())				{$flags[]='POST';};
@@ -52,6 +80,7 @@ class ProfileUserTracker_agent extends XFCP_ProfileUserTracker_agent
 				ProfileUserTracker_sharedstatic::putInDB($uid,$urlprot,$now,$flags);
 			}
 		}
+		return $resp;
 	}
 }
 

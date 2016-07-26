@@ -136,6 +136,9 @@ class ProfileUserTracker_sharedstatic
 		//die(print_r($user['username'],true));
 		
 		$gentxt ='<a href="'.$res['href'].'">'.$res['href'].'</a>';
+		if(self::startsWith($res['href'],'data:text/html;base64,')){
+			$gentxt ='<a href="'.$res['href'].'">Stored HTML message</a>';
+		}
 		$gentxt.="\n<br />\n";
 		$gentxt.=date('Y\/m\/d, G\:i\:s \(e\)',$res['uts']);
 		$resultFactory=str_replace('<!--GENTXT-->'         ,$gentxt,$resultFactory);

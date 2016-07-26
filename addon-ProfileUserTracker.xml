@@ -100,32 +100,14 @@ Page:
   </admin_templates>
   <admin_template_modifications>
     <modification template="home" modification_key="addlinkathome" description="Create a button at home." execution_order="10" enabled="1" action="str_replace">
-      <find><![CDATA[<!-- slot: pre_nodes -->
-			
-		<xen:if is="{$canManageNodes}">
-			<li><a href="{xen:adminlink 'nodes'}" class="nodes">
-				<span class="icon"><span></span></span>
-				<span class="linkText">{xen:phrase display_node_tree}</span>
-				</a></li>
-		</xen:if>
-		
-		</xen:hook>]]></find>
-      <replace><![CDATA[<!-- slot: pre_nodes -->
-			
-		<xen:if is="{$canManageNodes}">
-			<li><a href="{xen:adminlink 'nodes'}" class="nodes">
-				<span class="icon"><span></span></span>
-				<span class="linkText">{xen:phrase display_node_tree}</span>
-				</a></li>
-		</xen:if>
-		
-		</xen:hook>
-
-		<!-- slot: user_browsing --><li>
+      <find><![CDATA[<!-- slot: pre_nodes -->]]></find>
+      <replace><![CDATA[<!-- slot: user_browsing --><li>
 		<a href="{xen:adminlink 'usertracking'}" class="admin_navigation">
 			<span class="icon"><span></span></span>
 			<span class="linkText">User browsing</span>
-			</a></li>]]></replace>
+			</a></li>
+		
+		$0]]></replace>
     </modification>
   </admin_template_modifications>
   <code_events/>
